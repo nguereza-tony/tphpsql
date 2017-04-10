@@ -1,0 +1,108 @@
+#!/bin/bash
+clear
+set -e
+
+#app config
+app_config_path="/etc/tphpsql/tphpsql.conf"
+app_bin_path="/usr/bin/tphpsql"
+app_config_bin_path="/usr/bin/tphpsql-conf"
+app_sys_user="tphpsql"
+
+echo
+echo "Installing tphpsql ..."
+echo
+
+if test ! -f $app_config_path
+then
+	#default MySQL config
+	dmysql_host="localhost"
+	dmysql_user="root"
+	dmysql_password=
+	dmysql_port=3306
+else
+	#existing MySQL config
+	dmysql_host=$(grep "sql_host" $app_config_path | cut -d= -f2 | sed -e 's/^[ \t]*//')
+	dmysql_user=$(grep "sql_user" $app_config_path | cut -d= -f2 | sed -e 's/^[ \t]*//')
+	dmysql_password=$(grep "sql_password" $app_config_path | cut -d= -f2 | sed -e 's/^[ \t]*//')
+	dmysql_port=$(grep "sql_port" $app_config_path | cut -d= -f2 | sed -e 's/^[ \t]*//')
+	
+	echo -e "The config file [$app_config_path] exists.\nDo you want to edit it ? (y/n)\nyes = override\nno = keep an existing\nDefault is no."
+	read answer
+fi
+
+
+if [[ ! -f $app_config_path || $answer = y || $answer = yes ]]
+then
+	echo "Please enter the MySQL configuration below"
+	echo
+	echo "The mysql hostname[$dmysql_host]"
+	read host
+
+	echo "The mysql username[$dmysql_user]"
+	read user
+
+	echo "The mysql password[default is no password]"
+	read -s password
+
+	echo "The mysql port[$dmysql_port]"
+	read port
+	
+	echo "Creating config file $app_config_path..."
+	
+	if test -z $user
+	then
+		user=$dmysql_user
+	fi
+
+
+	if test -z $host
+	then
+		host=$dmysql_host
+	fi
+
+	if test -z $port
+	then
+		port=$dmysql_port
+	fi
+
+	cat > $app_config_path <<CONFIG
+;the mysql server address default is localhost
+sql_host = #host#
+
+;the mysql server username default is root
+sql_user = #user#
+
+;the mysql server password default is null
+sql_password = #password#
+
+;the mysql server port default is 3306
+sql_port = #port#
+CONFIG
+
+	sed -i "s/#host#/$host/g" $app_config_path
+	sed -i "s/#user#/$user/g" $app_config_path
+	sed -i "s/#password#/$password/g" $app_config_path
+	sed -i "s/#port#/$port/g" $app_config_path
+
+	sleep 2	
+
+fi
+
+
+if ! grep "^$app_sys_user" /etc/passwd > /dev/null
+then
+	echo "Creating the system user $app_sys_user ..."
+	adduser --disabled-password --system -q --no-create-home $app_sys_user 
+	sleep 3
+fi
+
+chown $app_sys_user $app_config_path
+chmod 640 $app_config_path
+chmod 755 $app_bin_path
+chmod 755 $app_config_bin_path
+
+if test $? = 0
+then
+	sleep 1
+	echo "tphpsql installing successfuly. Type tphpsql --help for help"
+fi

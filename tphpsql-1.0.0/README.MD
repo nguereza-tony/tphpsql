@@ -6,10 +6,6 @@ you must have PHP 5.3 and less than 7 because the app use the mysql extension re
 
 just download the package and install it.
 
-* [tphpsql-1.0.0 (debian or ubuntu)](https://raw.github.com/nguereza-tony/tphpsql/tphpsql-1.0.0/1.0.0/tphpsql-1.0.0.deb)
-* [tphpsql-1.0.0 source zip](https://github.com/nguereza-tony/tphpsql/tphpsql-1.0.0.zip)
-
-
 ```bash
 sudo dpkg -i package-version.deb
 ```

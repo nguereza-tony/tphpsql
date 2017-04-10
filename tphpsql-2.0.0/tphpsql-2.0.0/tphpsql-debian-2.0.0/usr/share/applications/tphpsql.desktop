@@ -1,0 +1,13 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=3.5.1
+Encoding=UTF-8
+Name=tphpsql
+GenericName=tphpsql
+Comment=PHP MySQL Table Class Generator
+Exec=tphpsql
+#Icon=/opt/icecat/icons/mozicon128.png
+Terminal=true
+Type=Application
+Categories=Application;Development;
+Name[fr_FR]=tphpsql

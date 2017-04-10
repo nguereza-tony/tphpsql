@@ -1,0 +1,4 @@
+2.0.0 :
+    * The app is now comptabible with PHP 7
+    * using mysqli extension because the mysql extension is not available in PHP 7
+    * you can using a config ini file to define some configuration

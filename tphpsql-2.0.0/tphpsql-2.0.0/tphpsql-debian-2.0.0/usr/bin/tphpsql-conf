@@ -1,0 +1,90 @@
+#!/bin/bash
+clear
+set -e
+
+#app config
+app_config_path="/etc/tphpsql/tphpsql.conf"
+app_bin_path="/usr/bin/tphpsql"
+app_config_bin_path="/usr/bin/tphpsql-conf"
+app_sys_user="tphpsql"
+
+if test ! -d "/etc/tphpsql"
+then
+	mkdir "/etc/tphpsql" && touch $app_config_path
+fi
+
+#default MySQL config
+dmysql_host=$(grep "sql_host" $app_config_path | cut -d= -f2 | sed -e 's/^[ \t]*//')
+dmysql_user=$(grep "sql_user" $app_config_path | cut -d= -f2 | sed -e 's/^[ \t]*//')
+dmysql_password=$(grep "sql_password" $app_config_path | cut -d= -f2 | sed -e 's/^[ \t]*//')
+dmysql_port=$(grep "sql_port" $app_config_path | cut -d= -f2 | sed -e 's/^[ \t]*//')
+
+echo "tphpsql configuration ..."
+echo "Please enter the MySQL configuration below"
+echo
+echo "The mysql hostname[$dmysql_host]"
+read host
+
+echo "The mysql username[$dmysql_user]"
+read user
+
+echo "The mysql password leave empty for no value"
+read -s password
+
+echo "The mysql port[$dmysql_port]"
+read port
+
+if test -z $user
+then
+	user=$dmysql_user
+fi
+
+
+if test -z $host
+then
+	host=$dmysql_host
+fi
+
+
+if test -z $port
+then
+	port=$dmysql_port
+fi
+
+		cat > $app_config_path <<CONFIG
+;the mysql server address default is localhost
+sql_host = #host#
+
+;the mysql server username default is root
+sql_user = #user#
+
+;the mysql server password default is null
+sql_password = #password#
+
+;the mysql server port default is 3306
+sql_port = #port#
+CONFIG
+	
+echo "Updating config file $app_config_path..."
+sed -i "s/#host#/$host/g" $app_config_path
+sed -i "s/#user#/$user/g" $app_config_path
+sed -i "s/#password#/$password/g" $app_config_path
+sed -i "s/#port#/$port/g" $app_config_path
+sleep 2
+
+
+
+if ! grep "^$app_sys_user" /etc/passwd > /dev/null
+then
+	echo "Creating the system user $app_sys_user ..."
+	adduser --disabled-password --system -q --no-create-home $app_sys_user 
+	sleep 3
+fi
+
+chown $app_sys_user $app_config_path
+chmod 640 $app_config_path
+
+if test $? = 0
+then
+	echo  "tphpsql configuring successfuly."
+fi
