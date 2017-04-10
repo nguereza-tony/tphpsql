@@ -1,0 +1,12 @@
+Package: tphpsql
+Version: 1.0.0
+Section: main
+Priority: optional
+Architecture: all
+Depends: bash (>= 4), php5 (>= 5.3),php5 (<< 7), php5-mysql, php5-cli (>= 5.3), php5-cli (<<7)
+Maintainer: Tony NGUEREZA <nguerezatony@gmail.com>
+Homepage : http://www.nguereza-tony.cf
+Description: PHP SQL Table Class generator
+ This app is used to create the PHP class (OOP) for every MySQL table and their manager.
+
+
